@@ -12,6 +12,9 @@
 		3D2F5A742C174FDD0081BC78 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F5A732C174FDD0081BC78 /* Assets.xcassets */; };
 		3D2F5A772C174FDD0081BC78 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F5A762C174FDD0081BC78 /* Preview Assets.xcassets */; };
 		3D2F5A802C1750160081BC78 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D2F5A7F2C1750160081BC78 /* ViewModel.swift */; };
+		3D668A8B2C199BFE0044CEBE /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D668A8A2C199BFE0044CEBE /* ChartView.swift */; };
+		3D668AB62C19BDDA0044CEBE /* VerticalBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D668AB32C19BDDA0044CEBE /* VerticalBarView.swift */; };
+		3D668AB72C19BDDA0044CEBE /* BarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D668AB42C19BDDA0044CEBE /* BarChartView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +25,9 @@
 		3D2F5A762C174FDD0081BC78 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3D2F5A782C174FDD0081BC78 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3D2F5A7F2C1750160081BC78 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
+		3D668A8A2C199BFE0044CEBE /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		3D668AB32C19BDDA0044CEBE /* VerticalBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalBarView.swift; sourceTree = "<group>"; };
+		3D668AB42C19BDDA0044CEBE /* BarChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +63,8 @@
 				3D2F5A6F2C174FDC0081BC78 /* StudiousApp.swift */,
 				3D2F5A7F2C1750160081BC78 /* ViewModel.swift */,
 				3D2F5A712C174FDC0081BC78 /* ContentView.swift */,
+				3D668A8A2C199BFE0044CEBE /* ChartView.swift */,
+				3D668AB12C19BDDA0044CEBE /* BarChart */,
 				3D2F5A732C174FDD0081BC78 /* Assets.xcassets */,
 				3D2F5A782C174FDD0081BC78 /* Info.plist */,
 				3D2F5A752C174FDD0081BC78 /* Preview Content */,
@@ -70,6 +78,15 @@
 				3D2F5A762C174FDD0081BC78 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		3D668AB12C19BDDA0044CEBE /* BarChart */ = {
+			isa = PBXGroup;
+			children = (
+				3D668AB32C19BDDA0044CEBE /* VerticalBarView.swift */,
+				3D668AB42C19BDDA0044CEBE /* BarChartView.swift */,
+			);
+			path = BarChart;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -88,6 +105,8 @@
 			dependencies = (
 			);
 			name = Studious;
+			packageProductDependencies = (
+			);
 			productName = Studious;
 			productReference = 3D2F5A6C2C174FDC0081BC78 /* Studious.app */;
 			productType = "com.apple.product-type.application";
@@ -115,6 +134,8 @@
 				Base,
 			);
 			mainGroup = 3D2F5A632C174FDC0081BC78;
+			packageReferences = (
+			);
 			productRefGroup = 3D2F5A6D2C174FDC0081BC78 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -142,8 +163,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D2F5A722C174FDC0081BC78 /* ContentView.swift in Sources */,
+				3D668AB62C19BDDA0044CEBE /* VerticalBarView.swift in Sources */,
 				3D2F5A802C1750160081BC78 /* ViewModel.swift in Sources */,
+				3D668AB72C19BDDA0044CEBE /* BarChartView.swift in Sources */,
 				3D2F5A702C174FDC0081BC78 /* StudiousApp.swift in Sources */,
+				3D668A8B2C199BFE0044CEBE /* ChartView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

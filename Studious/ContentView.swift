@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  ViewModel.swift
 //  Studious
 //
 //  Created by Alex on 6/10/24.
@@ -9,23 +9,26 @@ import SwiftUI
 import AVFoundation
 
 struct ContentView: View {
-//    @ObservedObject var viewModel = ViewModel()
-    
-    let subjects = ["Math", "Literature", "English"]
+    let subjects = ["Math", "Literature", "English", "Test"]
     let timings: [String: (work: Int, break: Int)] = [
-            "Math": (25 * 60, 5 * 60),
-            "Literature": (60 * 60, 10 * 60),
-            "English": (30 * 60, 5 * 60)
-        ]
+        "Math": (25 * 60, 5 * 60),
+        "Literature": (60 * 60, 10 * 60),
+        "English": (30 * 60, 5 * 60),
+        "Test": (0 * 60, 1 * 60)
+    ]
+    
     @State private var workTime = 25 * 60
     @State private var breakTime = 5 * 60
-
     @State private var timer: Timer?
     @State private var isTimerRunning = false
     @AppStorage("isBreakTime") private var isBreakTime = false
     @AppStorage("timeRemaining") private var timeRemaining = 25 * 60
-    @AppStorage("selectedSubject") private var selectedSubject = "Math" // Default subject
-
+    @AppStorage("selectedSubject") private var selectedSubject = "Math"
+    
+    @AppStorage("workSessionsCompleted") private var workSessionsCompleted = 0
+    @AppStorage("breakSessionsCompleted") private var breakSessionsCompleted = 0
+    @State private var showingChart = false
+    
     var body: some View {
         ZStack {
             Color(isBreakTime ? .white : .purple).edgesIgnoringSafeArea(.all)
@@ -33,13 +36,12 @@ struct ContentView: View {
             VStack {
                 Spacer()
                 
-                // ComboBox for selecting subjects
                 Picker(selection: $selectedSubject, label: Text(selectedSubject)) {
                     ForEach(subjects, id: \.self) { subject in
                         Text(subject)
                     }
                 }
-                .pickerStyle(MenuPickerStyle()) // Style the picker
+                .pickerStyle(MenuPickerStyle())
                 .foregroundColor(isBreakTime ? .blue : .white)
                 .padding()
                 .onChange(of: selectedSubject) { newValue in
@@ -52,9 +54,9 @@ struct ContentView: View {
                         .stroke(lineWidth: 20)
                         .opacity(0.3)
                         .foregroundColor(.gray)
-                        .shadow(color: .black, radius: 10, x: 0, y: 0) // Add shadow effect
+                        .shadow(color: .black, radius: 10, x: 0, y: 0)
                     Circle()
-                        .trim(from: 0, to: CGFloat(timeRemaining) / CGFloat(isBreakTime ? self.breakTime : self.workTime)) // Max time for work: 25 minutes, for break: 5 minutes
+                        .trim(from: 0, to: CGFloat(timeRemaining) / CGFloat(isBreakTime ? self.breakTime : self.workTime))
                         .stroke(style: StrokeStyle(lineWidth: 20, lineCap: .round, lineJoin: .round))
                         .foregroundColor(isBreakTime ? .blue : .green)
                         .rotationEffect(.degrees(-90))
@@ -68,6 +70,14 @@ struct ContentView: View {
                 
                 HStack(spacing: 20) {
                     Button(action: {
+                        stopTimer()
+                    }) {
+                        Image(systemName: "stop.circle.fill")
+                            .font(.largeTitle)
+                            .foregroundColor(.red)
+                    }
+                    
+                    Button(action: {
                         if isTimerRunning {
                             pauseTimer()
                         } else {
@@ -80,25 +90,28 @@ struct ContentView: View {
                     }
                     
                     Button(action: {
-                        stopTimer()
-                    }) {
-                        Image(systemName: "stop.circle.fill")
-                            .font(.largeTitle)
-                            .foregroundColor(.red)
-                    }
-                    
-                    Button(action: {
                         nextSession()
                     }) {
                         Image(systemName: "arrow.right.circle.fill")
                             .font(.largeTitle)
                             .foregroundColor(.yellow)
                     }
+                    
+                    Button(action: {
+                        showingChart.toggle()
+                    }) {
+                        Image(systemName: "chart.pie.fill")
+                            .font(.largeTitle)
+                            .foregroundColor(.green)
+                    }
                 }
                 .padding()
                 
                 Spacer()
             }
+        }
+        .sheet(isPresented: $showingChart) {
+            ChartView(workSessions: workSessionsCompleted, breakSessions: breakSessionsCompleted)
         }
         .onAppear {
             updateTimes(for: selectedSubject)
@@ -114,13 +127,14 @@ struct ContentView: View {
                 } else {
                     timer?.invalidate()
                     timer = nil
+                    playSystemSound()
                     if isBreakTime {
-                        playSystemSound()
-                        timeRemaining = self.workTime // Reset to work time
+                        breakSessionsCompleted += 1
+                        timeRemaining = self.workTime
                         isBreakTime = false
                     } else {
-                        playSystemSound()
-                        timeRemaining = self.breakTime // Set to break time
+                        workSessionsCompleted += 1
+                        timeRemaining = self.breakTime
                         isBreakTime = true
                     }
                     isTimerRunning = false
@@ -139,16 +153,16 @@ struct ContentView: View {
         isTimerRunning = false
         timer?.invalidate()
         timer = nil
-        timeRemaining = self.workTime // Reset to initial work time
+        timeRemaining = self.workTime
         isBreakTime = false
     }
     
     func nextSession() {
         if isBreakTime {
-            timeRemaining = self.workTime // Reset to work time
+            timeRemaining = self.workTime
             isBreakTime = false
         } else {
-            timeRemaining = self.breakTime // Set to break time
+            timeRemaining = self.breakTime
             isBreakTime = true
         }
     }
@@ -167,7 +181,7 @@ struct ContentView: View {
     }
     
     func playSystemSound() {
-        let systemSoundID: SystemSoundID = 1304 // You can find different system sound IDs from documentation
+        let systemSoundID: SystemSoundID = 1304
         AudioServicesPlaySystemSound(systemSoundID)
     }
 }
