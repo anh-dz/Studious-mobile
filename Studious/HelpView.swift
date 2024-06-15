@@ -14,7 +14,7 @@ struct HelpView: View {
     @State var showPomodoro = false
     @State var pomoURL = "https://vi.wikipedia.org/wiki/Ph%C6%B0%C6%A1ng_ph%C3%A1p_qu%E1%BA%A3_c%C3%A0_chua"
     @State var showDev = false
-    @State var devURL = "https://skyhighlabs.app"
+    @State var devURL = ""
     @State var result: Result<MFMailComposeResult, Error>? = nil
     @State var isShowingShareView = false
     @State var resetStats = false
