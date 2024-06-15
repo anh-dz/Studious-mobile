@@ -28,6 +28,7 @@ struct ContentView: View {
     @AppStorage("workSessionsCompleted") private var workSessionsCompleted = 0
     @AppStorage("breakSessionsCompleted") private var breakSessionsCompleted = 0
     @State private var showingChart = false
+    @State private var showingHelp = false
     
     var body: some View {
         ZStack {
@@ -104,14 +105,25 @@ struct ContentView: View {
                             .font(.largeTitle)
                             .foregroundColor(.green)
                     }
+                    .sheet(isPresented: $showingChart) {
+                        ChartView(w: workSessionsCompleted, b: breakSessionsCompleted)
+                    }
+                    
+                    Button(action: {
+                        showingHelp.toggle()
+                    }) {
+                        Image(systemName: "info.circle.fill")
+                            .font(.largeTitle)
+                            .foregroundColor(.blue)
+                    }
+                    .sheet(isPresented: $showingHelp) {
+                        HelpView()
+                    }
                 }
                 .padding()
                 
                 Spacer()
             }
-        }
-        .sheet(isPresented: $showingChart) {
-            ChartView(workSessions: workSessionsCompleted, breakSessions: breakSessionsCompleted)
         }
         .onAppear {
             updateTimes(for: selectedSubject)
