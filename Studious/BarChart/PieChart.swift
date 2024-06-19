@@ -45,8 +45,8 @@ struct PieChart: View {
 struct ChartCellModel: Identifiable {
     let id = UUID()
     let color: Color
-    let value: CGFloat
     let name: String
+    let value: CGFloat
     var startAngle: Angle = .zero
     var endAngle: Angle = .zero
 }

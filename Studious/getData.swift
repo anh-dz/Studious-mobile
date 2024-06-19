@@ -3,3 +3,8 @@ struct ComboData: Codable {
     let rest: Int
     let work: Int
 }
+
+struct chartData: Codable {
+    let name: String
+    let value: Float
+}

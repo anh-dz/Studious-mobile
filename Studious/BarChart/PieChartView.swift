@@ -47,9 +47,7 @@ struct PieChartView: View {
 
 struct PieChartView_Previews: PreviewProvider {
     static var previews: some View {
-        let sample = [ChartCellModel(color: Color.blue, value: 10, name: "Math"),
-                      ChartCellModel(color: Color.yellow, value: 20, name: "Physics"),
-                      ChartCellModel(color: Color.pink, value: 50, name: "Chemistry")]
+        let sample = [ChartCellModel(color: Color.blue, name: "Math", value: 10)]
         
         PieChartView(sample: sample)
     }

@@ -10,7 +10,7 @@ import SwiftUI
 struct BarItem: Identifiable {
     var id = UUID()
     var name: String
-    var value: Double
+    var value: Float
 }
 
 enum BarStyle: Int {
@@ -22,13 +22,11 @@ struct ChartView: View {
     var w: Int
     var b: Int
     
-    @State private var dataWeek: [BarItem] = [BarItem(name: "Sun", value: 1), BarItem(name: "Mon", value: 2), BarItem(name: "Tue", value: 6), BarItem(name: "Wed", value: 4), BarItem(name: "Fri", value: 10), BarItem(name: "Sat", value: 10)]
+    @State var dataWeek: [BarItem] = []
+    
+    @State var dataSubject: [ChartCellModel] = []
     
     private let color: [Color] = [Color.blue, Color.green, Color.yellow, Color.pink, Color.black, Color.purple, Color.gray]
-    
-    @State private var dataSubject: [ChartCellModel] = [ChartCellModel(color: Color.blue, value: 10, name: "Math"),
-    ChartCellModel(color: Color.yellow, value: 20, name: "Physics"),
-    ChartCellModel(color: Color.gray, value: 50, name: "Chemistry")]
     
     var body: some View {
         ScrollView {
@@ -54,8 +52,77 @@ struct ChartView: View {
                 .padding()
             }
         }
+        .onAppear {
+            fetchBarData()
+            fetchPieData()
+        }
+    }
+    
+    private func fetchPieData() {
+        let url = URL(string: "http://127.0.0.1:5000/get_sum_data")!
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                print("Error fetching data: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                print("No data received from server")
+                return
+            }
+            
+            do {
+                let fetchedData = try JSONDecoder().decode([String: Float].self, from: data)
+                let myChartData = fetchedData.map { chartData(name: $0.key, value: $0.value) }
+                updatePieChart(with: myChartData)
+            } catch {
+                print("Error decoding JSON: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
+    
+    private func updatePieChart(with fetchedData: [chartData]) {
+        for (index, data) in fetchedData.enumerated() {
+            dataSubject.append(ChartCellModel(color: color[index], name: data.name, value: CGFloat(data.value)))
+        }
+    }
+    
+    private func fetchBarData() {
+        let url = URL(string: "http://127.0.0.1:5000/get_time")!
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                print("Error fetching data: \(error.localizedDescription)")
+                return
+            }
+
+            guard let data = data else {
+                print("No data received from server")
+                return
+            }
+
+            do {
+                let fetchedData = try JSONDecoder().decode([String: Float].self, from: data)
+                
+                let myChartData = fetchedData.map { chartData(name: $0.key, value: $0.value) }
+                
+                updateBarChart(with: myChartData)
+                
+            } catch {
+                print("Error decoding JSON: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
+    
+    private func updateBarChart(with fetchedData: [chartData]) {
+        for data in fetchedData {
+            print("\(data.name): \(data.value)")
+            dataWeek.append(BarItem(name: data.name, value: data.value))
+        }
     }
 }
+
 
 struct ChartView_Previews: PreviewProvider {
     static var previews: some View {

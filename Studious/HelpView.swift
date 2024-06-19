@@ -86,7 +86,7 @@ struct HelpView: View {
                             }
                         }
                         .sheet(isPresented: $showDev) {
-                            SafariView(url: URL(string: self.devURL)!)
+                            AboutView()
                         }
                         
                     }
@@ -163,7 +163,7 @@ struct HelpView: View {
     }
 }
 
-struct AboutView_Previews: PreviewProvider {
+struct Help_Previews: PreviewProvider {
     static var previews: some View {
         HelpView()
             .environment(\.locale, Locale(identifier: "es"))

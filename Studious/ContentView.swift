@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVFoundation
+import Foundation
 
 struct ContentView: View {
     @State var subjects = [String]()
@@ -126,43 +127,39 @@ struct ContentView: View {
         }
     }
     
-    func fetchTimingsFromServer() {
-            guard let url = URL(string: "http://127.0.0.1:5000/get_tasks") else {
-                print("Invalid URL")
+    private func fetchTimingsFromServer() {
+        let url = URL(string: "http://127.0.0.1:5000/get_tasks")!
+            
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                print("Error fetching data: \(error.localizedDescription)")
                 return
             }
             
-            URLSession.shared.dataTask(with: url) { data, response, error in
-                if let error = error {
-                    print("Error fetching data: \(error.localizedDescription)")
-                    return
-                }
-                
-                guard let data = data else {
-                    print("No data received from server")
-                    return
-                }
-                
-                do {
-                    let fetchedData = try JSONDecoder().decode([String: ComboData].self, from: data)
+            guard let data = data else {
+                print("No data received from server")
+                return
+            }
+            
+            do {
+                let fetchedData = try JSONDecoder().decode([String: ComboData].self, from: data)
                     
-                    // Update timings based on fetched data
-                    DispatchQueue.main.async {
-                        self.updateTimings(with: fetchedData)
-                    }
-                } catch {
-                    print("Error decoding JSON: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.updateTimings(with: fetchedData)
                 }
-            }.resume()
-        }
+            } catch {
+                print("Error decoding JSON: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
         
         // Function to update timings
-        private func updateTimings(with fetchedData: [String: ComboData]) {
-            for (_, comboData) in fetchedData {
-                timings[comboData.combo] = (work: comboData.work * 60, break: comboData.rest * 60)
-                subjects.append(comboData.combo)
-            }
+    private func updateTimings(with fetchedData: [String: ComboData]) {
+        for (_, comboData) in fetchedData {
+            timings[comboData.combo] = (work: comboData.work * 60, break: comboData.rest * 60)
+            subjects.append(comboData.combo)
         }
+    }
     
     func startTimer() {
         isTimerRunning = true
