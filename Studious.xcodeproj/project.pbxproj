@@ -19,6 +19,7 @@
 		3D6A20242C1D810C00FDF8B1 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6A20232C1D810C00FDF8B1 /* HelpView.swift */; };
 		3D6A203B2C1DFFBC00FDF8B1 /* PieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6A203A2C1DFFBC00FDF8B1 /* PieChart.swift */; };
 		3D6A20422C1E000000FDF8B1 /* PieChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6A20412C1E000000FDF8B1 /* PieChartView.swift */; };
+		3D6A20452C22807900FDF8B1 /* getData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6A20442C22807900FDF8B1 /* getData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		3D6A20232C1D810C00FDF8B1 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		3D6A203A2C1DFFBC00FDF8B1 /* PieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieChart.swift; sourceTree = "<group>"; };
 		3D6A20412C1E000000FDF8B1 /* PieChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieChartView.swift; sourceTree = "<group>"; };
+		3D6A20442C22807900FDF8B1 /* getData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = getData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 				3D2F5A6F2C174FDC0081BC78 /* StudiousApp.swift */,
 				3D2F5A7F2C1750160081BC78 /* ViewModel.swift */,
 				3D2F5A712C174FDC0081BC78 /* ContentView.swift */,
+				3D6A20442C22807900FDF8B1 /* getData.swift */,
 				3D668A8A2C199BFE0044CEBE /* ChartView.swift */,
 				3D6A20232C1D810C00FDF8B1 /* HelpView.swift */,
 				3D668AB12C19BDDA0044CEBE /* BarChart */,
@@ -188,6 +191,7 @@
 				3D2F5A802C1750160081BC78 /* ViewModel.swift in Sources */,
 				3D668AB72C19BDDA0044CEBE /* BarChartView.swift in Sources */,
 				3D2F5A702C174FDC0081BC78 /* StudiousApp.swift in Sources */,
+				3D6A20452C22807900FDF8B1 /* getData.swift in Sources */,
 				3D6A20422C1E000000FDF8B1 /* PieChartView.swift in Sources */,
 				3D6A20242C1D810C00FDF8B1 /* HelpView.swift in Sources */,
 				3D0416942C1C86EA0063738B /* CircleBar.swift in Sources */,

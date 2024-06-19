@@ -22,11 +22,13 @@ struct ChartView: View {
     var w: Int
     var b: Int
     
-    @State var dataWeek: [BarItem] = [BarItem(name: "Sun", value: 1), BarItem(name: "Mon", value: 2), BarItem(name: "Tue", value: 6), BarItem(name: "Wed", value: 4), BarItem(name: "Fri", value: 10), BarItem(name: "Sat", value: 10)]
+    @State private var dataWeek: [BarItem] = [BarItem(name: "Sun", value: 1), BarItem(name: "Mon", value: 2), BarItem(name: "Tue", value: 6), BarItem(name: "Wed", value: 4), BarItem(name: "Fri", value: 10), BarItem(name: "Sat", value: 10)]
     
-    @State var dataSubject: [ChartCellModel] = [ChartCellModel(color: Color.blue, value: 10, name: "Math"),
+    private let color: [Color] = [Color.blue, Color.green, Color.yellow, Color.pink, Color.black, Color.purple, Color.gray]
+    
+    @State private var dataSubject: [ChartCellModel] = [ChartCellModel(color: Color.blue, value: 10, name: "Math"),
     ChartCellModel(color: Color.yellow, value: 20, name: "Physics"),
-    ChartCellModel(color: Color.pink, value: 50, name: "Chemistry")]
+    ChartCellModel(color: Color.gray, value: 50, name: "Chemistry")]
     
     var body: some View {
         ScrollView {

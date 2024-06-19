@@ -1,5 +1,5 @@
 //
-//  ViewModel.swift
+//  ContentView.swift
 //  Studious
 //
 //  Created by Alex on 6/10/24.
@@ -9,13 +9,8 @@ import SwiftUI
 import AVFoundation
 
 struct ContentView: View {
-    let subjects = ["Math", "Literature", "English", "Test"]
-    let timings: [String: (work: Int, break: Int)] = [
-        "Math": (25 * 60, 5 * 60),
-        "Literature": (60 * 60, 10 * 60),
-        "English": (30 * 60, 5 * 60),
-        "Test": (0 * 60, 1 * 60)
-    ]
+    @State var subjects = [String]()
+    @State var timings: [String: (work: Int, break: Int)] = [:]
     
     @State private var workTime = 25 * 60
     @State private var breakTime = 5 * 60
@@ -126,9 +121,48 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            fetchTimingsFromServer()
             updateTimes(for: selectedSubject)
         }
     }
+    
+    func fetchTimingsFromServer() {
+            guard let url = URL(string: "http://127.0.0.1:5000/get_tasks") else {
+                print("Invalid URL")
+                return
+            }
+            
+            URLSession.shared.dataTask(with: url) { data, response, error in
+                if let error = error {
+                    print("Error fetching data: \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let data = data else {
+                    print("No data received from server")
+                    return
+                }
+                
+                do {
+                    let fetchedData = try JSONDecoder().decode([String: ComboData].self, from: data)
+                    
+                    // Update timings based on fetched data
+                    DispatchQueue.main.async {
+                        self.updateTimings(with: fetchedData)
+                    }
+                } catch {
+                    print("Error decoding JSON: \(error.localizedDescription)")
+                }
+            }.resume()
+        }
+        
+        // Function to update timings
+        private func updateTimings(with fetchedData: [String: ComboData]) {
+            for (_, comboData) in fetchedData {
+                timings[comboData.combo] = (work: comboData.work * 60, break: comboData.rest * 60)
+                subjects.append(comboData.combo)
+            }
+        }
     
     func startTimer() {
         isTimerRunning = true
