@@ -10,13 +10,14 @@ import AVFoundation
 import Foundation
 
 struct ContentView: View {
-    @State var subjects = [String]()
-    @State var timings: [String: (work: Int, break: Int)] = [:]
-    
     @State private var workTime = 25 * 60
     @State private var breakTime = 5 * 60
     @State private var timer: Timer?
     @State private var isTimerRunning = false
+    
+    @State var subjects = ["Pomodoro"]
+    @State var timings: [String: (work: Int, break: Int)] = ["Pomodoro": (25 * 60, 5 * 60)]
+    
     @AppStorage("isBreakTime") private var isBreakTime = false
     @AppStorage("timeRemaining") private var timeRemaining = 25 * 60
     @AppStorage("selectedSubject") private var selectedSubject = "Math"
@@ -155,6 +156,8 @@ struct ContentView: View {
         
         // Function to update timings
     private func updateTimings(with fetchedData: [String: ComboData]) {
+        timings = [:]
+        subjects = []
         for (_, comboData) in fetchedData {
             timings[comboData.combo] = (work: comboData.work * 60, break: comboData.rest * 60)
             subjects.append(comboData.combo)
