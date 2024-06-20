@@ -20,7 +20,7 @@ struct ContentView: View {
     
     @AppStorage("isBreakTime") private var isBreakTime = false
     @AppStorage("timeRemaining") private var timeRemaining = 25 * 60
-    @AppStorage("selectedSubject") private var selectedSubject = "Math"
+    @AppStorage("selectedSubject") private var selectedSubject = "Pomodoro"
     
     @AppStorage("workSessionsCompleted") private var workSessionsCompleted = 0
     @AppStorage("breakSessionsCompleted") private var breakSessionsCompleted = 0
