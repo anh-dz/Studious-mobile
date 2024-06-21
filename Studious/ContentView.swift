@@ -17,7 +17,6 @@ struct ContentView: View {
     
     @State var subjects = ["Pomodoro"]
     @State var timings: [String: (work: Int, break: Int)] = ["Pomodoro": (25 * 60, 5 * 60)]
-    
     @AppStorage("isBreakTime") private var isBreakTime = false
     @AppStorage("timeRemaining") private var timeRemaining = 25 * 60
     @AppStorage("selectedSubject") private var selectedSubject = "Pomodoro"
@@ -26,101 +25,117 @@ struct ContentView: View {
     @AppStorage("breakSessionsCompleted") private var breakSessionsCompleted = 0
     @State private var showingChart = false
     @State private var showingHelp = false
+    @State var breathViewOn = false
     
     var body: some View {
-        ZStack {
-            Color(isBreakTime ? .white : .purple).edgesIgnoringSafeArea(.all)
-            
-            VStack {
-                Spacer()
+        NavigationView {
+            ZStack {
+                Color(isBreakTime ? .white : .purple).edgesIgnoringSafeArea(.all)
                 
-                Picker(selection: $selectedSubject, label: Text(selectedSubject)) {
-                    ForEach(subjects, id: \.self) { subject in
-                        Text(subject)
-                    }
-                }
-                .pickerStyle(MenuPickerStyle())
-                .foregroundColor(isBreakTime ? .blue : .white)
-                .padding()
-                .onChange(of: selectedSubject) { newValue in
-                    updateTimes(for: newValue)
-                    selectedSubject = newValue
-                }
-                
-                ZStack {
-                    Circle()
-                        .stroke(lineWidth: 20)
-                        .opacity(0.3)
-                        .foregroundColor(.gray)
-                        .shadow(color: .black, radius: 10, x: 0, y: 0)
-                    Circle()
-                        .trim(from: 0, to: CGFloat(timeRemaining) / CGFloat(isBreakTime ? self.breakTime : self.workTime))
-                        .stroke(style: StrokeStyle(lineWidth: 20, lineCap: .round, lineJoin: .round))
-                        .foregroundColor(isBreakTime ? .blue : .green)
-                        .rotationEffect(.degrees(-90))
-                        .animation(.easeInOut)
+                VStack {
+                    Spacer()
                     
-                    Text("\(timeString(time: timeRemaining))")
-                        .font(.largeTitle)
-                        .foregroundColor(isBreakTime ? .black : .white)
-                }
-                .frame(width: 200, height: 200)
-                
-                HStack(spacing: 20) {
-                    Button(action: {
-                        stopTimer()
-                    }) {
-                        Image(systemName: "stop.circle.fill")
-                            .font(.largeTitle)
-                            .foregroundColor(.red)
-                    }
-                    
-                    Button(action: {
-                        if isTimerRunning {
-                            pauseTimer()
-                        } else {
-                            startTimer()
+                    Picker(selection: $selectedSubject, label: Text(selectedSubject)) {
+                        ForEach(subjects, id: \.self) { subject in
+                            Text(subject)
                         }
-                    }) {
-                        Image(systemName: isTimerRunning ? "pause.circle.fill" : "play.circle.fill")
-                            .font(.largeTitle)
-                            .foregroundColor(isTimerRunning ? .orange : Color(red: 131/255, green: 180/255, blue: 255/255))
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .foregroundColor(isBreakTime ? .blue : .white)
+                    .padding()
+                    .onChange(of: selectedSubject) { newValue in
+                        updateTimes(for: newValue)
+                        selectedSubject = newValue
                     }
                     
-                    Button(action: {
-                        nextSession()
-                    }) {
-                        Image(systemName: "arrow.right.circle.fill")
+                    ZStack {
+                        Circle()
+                            .stroke(lineWidth: 20)
+                            .opacity(0.3)
+                            .foregroundColor(.gray)
+                            .shadow(color: .black, radius: 10, x: 0, y: 0)
+                        Circle()
+                            .trim(from: 0, to: CGFloat(timeRemaining) / CGFloat(isBreakTime ? self.breakTime : self.workTime))
+                            .stroke(style: StrokeStyle(lineWidth: 20, lineCap: .round, lineJoin: .round))
+                            .foregroundColor(isBreakTime ? .blue : .green)
+                            .rotationEffect(.degrees(-90))
+                            .animation(.easeInOut)
+                        
+                        Text("\(timeString(time: timeRemaining))")
                             .font(.largeTitle)
-                            .foregroundColor(.yellow)
+                            .foregroundColor(isBreakTime ? .black : .white)
                     }
+                    .frame(width: 200, height: 200)
+                    .padding()
                     
-                    Button(action: {
-                        showingChart.toggle()
-                    }) {
-                        Image(systemName: "chart.pie.fill")
-                            .font(.largeTitle)
-                            .foregroundColor(.green)
+                    HStack(spacing: 20) {
+                        Button(action: {
+                            stopTimer()
+                        }) {
+                            Image(systemName: "stop.circle.fill")
+                                .font(.largeTitle)
+                                .foregroundColor(.red)
+                        }
+                        
+                        Button(action: {
+                            if isTimerRunning {
+                                pauseTimer()
+                            } else {
+                                startTimer()
+                            }
+                        }) {
+                            Image(systemName: isTimerRunning ? "pause.circle.fill" : "play.circle.fill")
+                                .font(.largeTitle)
+                                .foregroundColor(isTimerRunning ? .orange : Color(red: 131/255, green: 180/255, blue: 255/255))
+                        }
+                        
+                        Button(action: {
+                            nextSession()
+                        }) {
+                            Image(systemName: "arrow.right.circle.fill")
+                                .font(.largeTitle)
+                                .foregroundColor(.yellow)
+                        }
+                        
+                        Button(action: {
+                            showingChart.toggle()
+                        }) {
+                            Image(systemName: "chart.pie.fill")
+                                .font(.largeTitle)
+                                .foregroundColor(.green)
+                        }
+                        .sheet(isPresented: $showingChart) {
+                            ChartView(w: workSessionsCompleted, b: breakSessionsCompleted)
+                        }
+                        
+                        Button(action: {
+                            self.breathViewOn = true
+                        }) {
+                            Image(systemName: "staroflife.circle.fill")
+                                .font(.largeTitle)
+                                .foregroundColor(.yellow)
+                        }
+                        
+                        Button(action: {
+                            showingHelp.toggle()
+                        }) {
+                            Image(systemName: "info.circle.fill")
+                                .font(.largeTitle)
+                                .foregroundColor(.blue)
+                        }
+                        .sheet(isPresented: $showingHelp) {
+                            HelpView()
+                        }
                     }
-                    .sheet(isPresented: $showingChart) {
-                        ChartView(w: workSessionsCompleted, b: breakSessionsCompleted)
-                    }
+                    .padding()
                     
-                    Button(action: {
-                        showingHelp.toggle()
-                    }) {
-                        Image(systemName: "info.circle.fill")
-                            .font(.largeTitle)
-                            .foregroundColor(.blue)
-                    }
-                    .sheet(isPresented: $showingHelp) {
-                        HelpView()
-                    }
+                    NavigationLink(destination: BreathView(), isActive: self.$breathViewOn) { EmptyView() }
+                    
+                    Spacer()
                 }
-                .padding()
-                
-                Spacer()
             }
+//            .navigationTitle("")
+            .navigationBarHidden(true)
         }
         .onAppear {
             fetchTimingsFromServer()

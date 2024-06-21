@@ -21,6 +21,7 @@
 		3D6A20422C1E000000FDF8B1 /* PieChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6A20412C1E000000FDF8B1 /* PieChartView.swift */; };
 		3D6A20452C22807900FDF8B1 /* getData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6A20442C22807900FDF8B1 /* getData.swift */; };
 		3D9F6D942C232D2900BCD55F /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D9F6D932C232D2900BCD55F /* AboutView.swift */; };
+		3D9F6DEB2C2424B700BCD55F /* BreathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D9F6DEA2C2424B700BCD55F /* BreathView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		3D6A20412C1E000000FDF8B1 /* PieChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieChartView.swift; sourceTree = "<group>"; };
 		3D6A20442C22807900FDF8B1 /* getData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = getData.swift; sourceTree = "<group>"; };
 		3D9F6D932C232D2900BCD55F /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		3D9F6DEA2C2424B700BCD55F /* BreathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +78,7 @@
 				3D2F5A6F2C174FDC0081BC78 /* StudiousApp.swift */,
 				3D2F5A7F2C1750160081BC78 /* ViewModel.swift */,
 				3D2F5A712C174FDC0081BC78 /* ContentView.swift */,
+				3D9F6DEA2C2424B700BCD55F /* BreathView.swift */,
 				3D6A20442C22807900FDF8B1 /* getData.swift */,
 				3D668A8A2C199BFE0044CEBE /* ChartView.swift */,
 				3D6A20232C1D810C00FDF8B1 /* HelpView.swift */,
@@ -199,6 +202,7 @@
 				3D6A20422C1E000000FDF8B1 /* PieChartView.swift in Sources */,
 				3D6A20242C1D810C00FDF8B1 /* HelpView.swift in Sources */,
 				3D0416942C1C86EA0063738B /* CircleBar.swift in Sources */,
+				3D9F6DEB2C2424B700BCD55F /* BreathView.swift in Sources */,
 				3D668A8B2C199BFE0044CEBE /* ChartView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

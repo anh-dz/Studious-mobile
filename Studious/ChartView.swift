@@ -117,7 +117,6 @@ struct ChartView: View {
     
     private func updateBarChart(with fetchedData: [chartData]) {
         for data in fetchedData {
-            print("\(data.name): \(data.value)")
             dataWeek.append(BarItem(name: data.name, value: data.value))
         }
     }
