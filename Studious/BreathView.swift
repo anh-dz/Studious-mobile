@@ -57,18 +57,6 @@ struct BreathView: View {
                         .foregroundColor(.white)
                         .font(.system(size: 18))
                     
-//                    Button(action: {
-//                        exit(0)
-//                    }) {
-//                        Text("ĐÓNG")
-//                            .font(.system(size: 18))
-//                            .foregroundColor(.white)
-//                            .padding()
-//                            .background(Color.red)
-//                            .cornerRadius(5)
-//                    }
-//                    .frame(width: 100, height: 50)
-                    
                     Spacer().frame(height: geometry.safeAreaInsets.bottom)
                 }
                 .onAppear(perform: self.startAnimation)

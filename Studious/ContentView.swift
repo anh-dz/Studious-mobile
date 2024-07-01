@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  Studious
-//
-//  Created by Alex on 6/10/24.
-//
-
 import SwiftUI
 import AVFoundation
 import Foundation
@@ -26,6 +19,7 @@ struct ContentView: View {
     @State private var showingChart = false
     @State private var showingHelp = false
     @State var breathViewOn = false
+    @State private var showMenu = false
     
     var body: some View {
         NavigationView {
@@ -96,46 +90,43 @@ struct ContentView: View {
                                 .font(.largeTitle)
                                 .foregroundColor(.yellow)
                         }
-                        
-                        Button(action: {
-                            showingChart.toggle()
-                        }) {
-                            Image(systemName: "chart.pie.fill")
-                                .font(.largeTitle)
-                                .foregroundColor(.green)
-                        }
-                        .sheet(isPresented: $showingChart) {
-                            ChartView(w: workSessionsCompleted, b: breakSessionsCompleted)
-                        }
-                        
-                        Button(action: {
-                            self.breathViewOn = true
-                        }) {
-                            Image(systemName: "staroflife.circle.fill")
-                                .font(.largeTitle)
-                                .foregroundColor(.yellow)
-                        }
-                        
-                        Button(action: {
-                            showingHelp.toggle()
-                        }) {
-                            Image(systemName: "info.circle.fill")
-                                .font(.largeTitle)
-                                .foregroundColor(.blue)
-                        }
-                        .sheet(isPresented: $showingHelp) {
-                            HelpView()
-                        }
                     }
                     .padding()
-                    
-                    NavigationLink(destination: BreathView(), isActive: self.$breathViewOn) { EmptyView() }
-                    
                     Spacer()
                 }
+                GeometryReader { _ in
+                  
+                  HStack {
+                    Spacer()
+                    
+                    SlideMenu(w: workSessionsCompleted, b: breakSessionsCompleted)
+                      .offset(x: showMenu ? 0 : UIScreen.main.bounds.width)
+                      .animation(.easeInOut(duration: 0.4), value: showMenu)
+                  }
+                  
+                }
+                .background(Color.black.opacity(showMenu ? 0.6 : 0))
+                .edgesIgnoringSafeArea(.bottom)
             }
-//            .navigationTitle("")
-            .navigationBarHidden(true)
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Studious")
+            .toolbar {
+                  Button {
+                    self.showMenu.toggle()
+                  } label: {
+                    
+                    if showMenu {
+                      Image(systemName: "xmark")
+                        .font(.title)
+                        .foregroundColor(.red)
+                      
+                    } else {
+                      Image(systemName: "text.justify")
+                        .font(.title)
+                        .foregroundColor(.red)
+                    }
+                }
+            }
         }
         .onAppear {
             fetchTimingsFromServer()
@@ -177,6 +168,34 @@ struct ContentView: View {
             timings[comboData.combo] = (work: comboData.work * 60, break: comboData.rest * 60)
             subjects.append(comboData.combo)
         }
+    }
+    
+    private func postSessionData() {
+        guard let url = URL(string: "http://127.0.0.1:5000/sync_timeData") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let body: [AnyHashable] = [selectedSubject, workTime - timeRemaining]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: .fragmentsAllowed)
+        
+        let task = URLSession.shared.dataTask(with: request) { data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do {
+                let response = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                print(response)
+            }
+            catch {
+                print(error)
+            }
+        }
+        task.resume()
     }
     
     func startTimer() {
@@ -223,6 +242,7 @@ struct ContentView: View {
             timeRemaining = self.workTime
             isBreakTime = false
         } else {
+            postSessionData()
             timeRemaining = self.breakTime
             isBreakTime = true
         }
