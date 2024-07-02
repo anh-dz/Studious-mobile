@@ -1,6 +1,5 @@
 import SwiftUI
 import AVFoundation
-import Foundation
 
 struct ContentView: View {
     @State private var workTime = 25 * 60
@@ -16,10 +15,15 @@ struct ContentView: View {
     
     @AppStorage("workSessionsCompleted") private var workSessionsCompleted = 0
     @AppStorage("breakSessionsCompleted") private var breakSessionsCompleted = 0
+    
+    @AppStorage("userCode") var userCode = "studious"
+    
     @State private var showingChart = false
     @State private var showingHelp = false
     @State var breathViewOn = false
     @State private var showMenu = false
+    
+    @State private var oldUserCode: String = "studious"
     
     var body: some View {
         NavigationView {
@@ -57,6 +61,7 @@ struct ContentView: View {
                         
                         Text("\(timeString(time: timeRemaining))")
                             .font(.largeTitle)
+                            .fontWeight(.bold)
                             .foregroundColor(isBreakTime ? .black : .white)
                     }
                     .frame(width: 200, height: 200)
@@ -73,8 +78,10 @@ struct ContentView: View {
                         
                         Button(action: {
                             if isTimerRunning {
+                                playStopSound()
                                 pauseTimer()
                             } else {
+                                playStartSound()
                                 startTimer()
                             }
                         }) {
@@ -95,35 +102,37 @@ struct ContentView: View {
                     Spacer()
                 }
                 GeometryReader { _ in
-                  
                   HStack {
                     Spacer()
-                    
-                    SlideMenu(w: workSessionsCompleted, b: breakSessionsCompleted)
+                    SlideMenu(w: workSessionsCompleted, b: breakSessionsCompleted, userCode: $userCode)
                       .offset(x: showMenu ? 0 : UIScreen.main.bounds.width)
                       .animation(.easeInOut(duration: 0.4), value: showMenu)
                   }
-                  
                 }
                 .background(Color.black.opacity(showMenu ? 0.6 : 0))
                 .edgesIgnoringSafeArea(.bottom)
+                .onChange(of: showMenu) { newValue in
+                    if !newValue && oldUserCode != userCode {
+                        oldUserCode = userCode
+                        fetchTimingsFromServer()
+                        updateTimes(for: selectedSubject)
+                    }
+                }
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("Studious")
             .toolbar {
-                  Button {
+                Button {
                     self.showMenu.toggle()
-                  } label: {
-                    
+                } label: {
                     if showMenu {
-                      Image(systemName: "xmark")
-                        .font(.title)
-                        .foregroundColor(.red)
-                      
+                        Image(systemName: "xmark")
+                            .font(.title)
+                            .foregroundColor(.red)
                     } else {
-                      Image(systemName: "text.justify")
-                        .font(.title)
-                        .foregroundColor(.red)
+                        Image(systemName: "text.justify")
+                            .font(.title)
+                            .foregroundColor(.red)
                     }
                 }
             }
@@ -131,36 +140,24 @@ struct ContentView: View {
         .onAppear {
             fetchTimingsFromServer()
             updateTimes(for: selectedSubject)
+            oldUserCode = userCode
         }
     }
     
     private func fetchTimingsFromServer() {
-        let url = URL(string: "http://127.0.0.1:5000/get_tasks")!
-            
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
-                print("Error fetching data: \(error.localizedDescription)")
-                return
-            }
-            
-            guard let data = data else {
-                print("No data received from server")
-                return
-            }
-            
-            do {
-                let fetchedData = try JSONDecoder().decode([String: ComboData].self, from: data)
-                    
+        ServerManager.shared.fetchTimings { fetchedData in
+            if let fetchedData = fetchedData {
                 DispatchQueue.main.async {
                     self.updateTimings(with: fetchedData)
                 }
-            } catch {
-                print("Error decoding JSON: \(error.localizedDescription)")
             }
-        }.resume()
+        }
     }
-        
-        // Function to update timings
+    
+    private func postSessionData() {
+        ServerManager.shared.postSessionData(subject: selectedSubject, workTime: workTime, timeRemaining: timeRemaining)
+    }
+    
     private func updateTimings(with fetchedData: [String: ComboData]) {
         timings = [:]
         subjects = []
@@ -168,34 +165,6 @@ struct ContentView: View {
             timings[comboData.combo] = (work: comboData.work * 60, break: comboData.rest * 60)
             subjects.append(comboData.combo)
         }
-    }
-    
-    private func postSessionData() {
-        guard let url = URL(string: "http://127.0.0.1:5000/sync_timeData") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let body: [AnyHashable] = [selectedSubject, workTime - timeRemaining]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: .fragmentsAllowed)
-        
-        let task = URLSession.shared.dataTask(with: request) { data, _, error in
-            guard let data = data, error == nil else {
-                return
-            }
-            
-            do {
-                let response = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
-                print(response)
-            }
-            catch {
-                print(error)
-            }
-        }
-        task.resume()
     }
     
     func startTimer() {
@@ -263,6 +232,16 @@ struct ContentView: View {
     
     func playSystemSound() {
         let systemSoundID: SystemSoundID = 1304
+        AudioServicesPlaySystemSound(systemSoundID)
+    }
+    
+    func playStartSound() {
+        let systemSoundID: SystemSoundID = 1113
+        AudioServicesPlaySystemSound(systemSoundID)
+    }
+    
+    func playStopSound() {
+        let systemSoundID: SystemSoundID = 1114
         AudioServicesPlaySystemSound(systemSoundID)
     }
 }
