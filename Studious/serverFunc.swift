@@ -7,17 +7,20 @@
 
 import Foundation
 
+let baseURL = "http://127.0.0.1:5000"
+
 class ServerManager {
-    var userCode: String = "74006cad4ed57f00a45ea1e2"
     static let shared = ServerManager()
     
     private init() {}
     
     func fetchTimings(completion: @escaping ([String: ComboData]?) -> Void) {
-        let url = URL(string: "http://127.0.0.1:5000/get_tasks")!
+        let url = URL(string: "\(baseURL)/get_tasks")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.addValue(userCode, forHTTPHeaderField: "user")
+        if let userCode = UserDefaults.standard.string(forKey: "userCode") {
+            request.addValue(userCode, forHTTPHeaderField: "user")
+        }
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
@@ -43,16 +46,44 @@ class ServerManager {
     }
     
     func postSessionData(subject: String, workTime: Int, timeRemaining: Int) {
-        guard let url = URL(string: "http://127.0.0.1:5000/sync_timeData") else {
+        guard let url = URL(string: "\(baseURL)/sync_timeData") else {
             return
         }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue(userCode, forHTTPHeaderField: "user")
+        if let userCode = UserDefaults.standard.string(forKey: "userCode") {
+            request.addValue(userCode, forHTTPHeaderField: "user")
+        }
         let body: [AnyHashable] = [subject, workTime - timeRemaining]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: .fragmentsAllowed)
+        
+        URLSession.shared.dataTask(with: request) { data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do {
+                let response = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                print(response)
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+    
+    func postConnected() {
+        guard let url = URL(string: "\(baseURL)/connect") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        if let userCode = UserDefaults.standard.string(forKey: "userCode") {
+            request.addValue(userCode, forHTTPHeaderField: "user")
+        }
         
         URLSession.shared.dataTask(with: request) { data, _, error in
             guard let data = data, error == nil else {
@@ -75,12 +106,9 @@ struct ChartData: Decodable {
 }
 
 class DataService {
-    var userCode: String = "74006cad4ed57f00a45ea1e2"
     
     static let shared = DataService()
-    
-    private let baseURL = "http://127.0.0.1:5000"
-    
+        
     func fetchPieData(completion: @escaping (Result<[ChartData], Error>) -> Void) {
         guard let url = URL(string: "\(baseURL)/get_sum_data") else {
             return
@@ -88,7 +116,9 @@ class DataService {
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.addValue(userCode, forHTTPHeaderField: "user")
+        if let userCode = UserDefaults.standard.string(forKey: "userCode") {
+            request.addValue(userCode, forHTTPHeaderField: "user")
+        }
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
@@ -119,7 +149,9 @@ class DataService {
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.addValue(userCode, forHTTPHeaderField: "user")
+        if let userCode = UserDefaults.standard.string(forKey: "userCode") {
+            request.addValue(userCode, forHTTPHeaderField: "user")
+        }
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {

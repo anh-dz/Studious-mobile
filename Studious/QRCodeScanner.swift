@@ -28,6 +28,9 @@ struct QRCodeScannerView: UIViewControllerRepresentable {
 
                 AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
                 parent.scannedCode = stringValue
+                UserDefaults.standard.synchronize()
+                UserDefaults.standard.set(parent.scannedCode, forKey: "userCode")
+                UserDefaults.standard.synchronize()
                 parent.presentationMode.wrappedValue.dismiss()
             }
         }
@@ -107,6 +110,9 @@ struct ImagePicker: UIViewControllerRepresentable {
             for feature in features as! [CIQRCodeFeature] {
                 if let stringValue = feature.messageString {
                     parent.scannedCode = stringValue
+                    UserDefaults.standard.synchronize()
+                    UserDefaults.standard.set(parent.scannedCode, forKey: "userCode")
+                    UserDefaults.standard.synchronize()
                     break
                 }
             }

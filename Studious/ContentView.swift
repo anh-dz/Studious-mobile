@@ -6,7 +6,8 @@ struct ContentView: View {
     @State private var breakTime = 5 * 60
     @State private var timer: Timer?
     @State private var isTimerRunning = false
-    
+    @State private var isUIHidden = false
+
     @State var subjects = ["Pomodoro"]
     @State var timings: [String: (work: Int, break: Int)] = ["Pomodoro": (25 * 60, 5 * 60)]
     @AppStorage("isBreakTime") private var isBreakTime = false
@@ -16,19 +17,19 @@ struct ContentView: View {
     @AppStorage("workSessionsCompleted") private var workSessionsCompleted = 0
     @AppStorage("breakSessionsCompleted") private var breakSessionsCompleted = 0
     
-    @AppStorage("userCode") var userCode = "studious"
+    @AppStorage("userCode") var userCode = ""
     
     @State private var showingChart = false
     @State private var showingHelp = false
     @State var breathViewOn = false
     @State private var showMenu = false
-    
-    @State private var oldUserCode: String = "studious"
-    
+        
     var body: some View {
         NavigationView {
             ZStack {
-                Color(isBreakTime ? .white : .purple).edgesIgnoringSafeArea(.all)
+                Image("BgImage")
+                    .resizable()
+                    .edgesIgnoringSafeArea(.all)
                 
                 VStack {
                     Spacer()
@@ -38,33 +39,23 @@ struct ContentView: View {
                             Text(subject)
                         }
                     }
+                    .font(.title)
                     .pickerStyle(MenuPickerStyle())
-                    .foregroundColor(isBreakTime ? .blue : .white)
+                    .foregroundColor(isBreakTime ? .yellow : .white)
                     .padding()
+                    .disabled(timeRemaining != self.workTime && !isBreakTime || isTimerRunning)
                     .onChange(of: selectedSubject) { newValue in
                         updateTimes(for: newValue)
                         selectedSubject = newValue
                     }
                     
                     ZStack {
-                        Circle()
-                            .stroke(lineWidth: 20)
-                            .opacity(0.3)
-                            .foregroundColor(.gray)
-                            .shadow(color: .black, radius: 10, x: 0, y: 0)
-                        Circle()
-                            .trim(from: 0, to: CGFloat(timeRemaining) / CGFloat(isBreakTime ? self.breakTime : self.workTime))
-                            .stroke(style: StrokeStyle(lineWidth: 20, lineCap: .round, lineJoin: .round))
-                            .foregroundColor(isBreakTime ? .blue : .green)
-                            .rotationEffect(.degrees(-90))
-                            .animation(.easeInOut)
-                        
                         Text("\(timeString(time: timeRemaining))")
-                            .font(.largeTitle)
+                            .font(.system(size: 97))
                             .fontWeight(.bold)
-                            .foregroundColor(isBreakTime ? .black : .white)
+                            .foregroundColor(isBreakTime ? .yellow : .white)
                     }
-                    .frame(width: 200, height: 200)
+                    .frame(width: 300, height: 100)
                     .padding()
                     
                     HStack(spacing: 20) {
@@ -75,14 +66,22 @@ struct ContentView: View {
                                 .font(.largeTitle)
                                 .foregroundColor(.red)
                         }
+                        .opacity(isUIHidden ? 0 : 1)
+                        .animation(.easeInOut, value: isUIHidden)
                         
                         Button(action: {
                             if isTimerRunning {
                                 playStopSound()
                                 pauseTimer()
+                                withAnimation {
+                                    isUIHidden = false
+                                }
                             } else {
                                 playStartSound()
                                 startTimer()
+                                withAnimation {
+                                    isUIHidden = true
+                                }
                             }
                         }) {
                             Image(systemName: isTimerRunning ? "pause.circle.fill" : "play.circle.fill")
@@ -97,42 +96,42 @@ struct ContentView: View {
                                 .font(.largeTitle)
                                 .foregroundColor(.yellow)
                         }
+                        .opacity(isUIHidden ? 0 : 1)
+                        .animation(.easeInOut, value: isUIHidden)
                     }
                     .padding()
                     Spacer()
                 }
                 GeometryReader { _ in
-                  HStack {
-                    Spacer()
-                    SlideMenu(w: workSessionsCompleted, b: breakSessionsCompleted, userCode: $userCode)
-                      .offset(x: showMenu ? 0 : UIScreen.main.bounds.width)
-                      .animation(.easeInOut(duration: 0.4), value: showMenu)
-                  }
+                    HStack {
+                        Spacer()
+                        SlideMenu(w: workSessionsCompleted, b: breakSessionsCompleted)
+                            .offset(x: showMenu ? 0 : UIScreen.main.bounds.width)
+                            .animation(.easeInOut(duration: 0.4), value: showMenu)
+                    }
                 }
                 .background(Color.black.opacity(showMenu ? 0.6 : 0))
                 .edgesIgnoringSafeArea(.bottom)
                 .onChange(of: showMenu) { newValue in
-                    if !newValue && oldUserCode != userCode {
-                        oldUserCode = userCode
-                        fetchTimingsFromServer()
-                        updateTimes(for: selectedSubject)
-                    }
+                    fetchTimingsFromServer()
+                    updateTimes(for: selectedSubject)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("Studious")
+            .navigationBarHidden(isUIHidden ? true : false)
             .toolbar {
                 Button {
                     self.showMenu.toggle()
                 } label: {
                     if showMenu {
                         Image(systemName: "xmark")
+                            .foregroundColor(.black)
                             .font(.title)
-                            .foregroundColor(.red)
                     } else {
                         Image(systemName: "text.justify")
+                            .foregroundColor(.black)
                             .font(.title)
-                            .foregroundColor(.red)
                     }
                 }
             }
@@ -140,12 +139,12 @@ struct ContentView: View {
         .onAppear {
             fetchTimingsFromServer()
             updateTimes(for: selectedSubject)
-            oldUserCode = userCode
+            ServerManager.shared.postConnected()
         }
     }
     
     private func fetchTimingsFromServer() {
-        ServerManager.shared.fetchTimings { fetchedData in
+        ServerManager.shared.fetchTimings() { fetchedData in
             if let fetchedData = fetchedData {
                 DispatchQueue.main.async {
                     self.updateTimings(with: fetchedData)
@@ -186,7 +185,6 @@ struct ContentView: View {
                         timeRemaining = self.breakTime
                         isBreakTime = true
                     }
-                    isTimerRunning = false
                 }
             }
         }

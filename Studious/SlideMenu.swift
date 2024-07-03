@@ -1,18 +1,9 @@
-//
-//  SlideMenu.swift
-//  Studious
-//
-//  Created by Alex on 7/1/24.
-//
-
 import SwiftUI
 
 struct SlideMenu: View {
     var w: Int
     var b: Int
-    
-    @Binding var userCode: String
-    
+
     @State private var showingChart = false
     @State private var showingHelp = false
     @State private var showingBreath = false
@@ -20,13 +11,7 @@ struct SlideMenu: View {
     @State private var isPresentingScanner = false
     @State private var isPresentingImagePicker = false
     @State private var showAlert = false
-    @State private var scannedCode: String? {
-        didSet {
-            if let code = scannedCode, code != userCode {
-                userCode = code
-            }
-        }
-    }
+    @State private var scannedCode: String?
     
     var body: some View {
         VStack {
@@ -99,8 +84,8 @@ struct SlideMenu: View {
             }
             .alert(isPresented: $showAlert) {
                 Alert(
-                    title: Text("Camera Not Available"),
-                    message: Text("Your device does not have a camera. Would you like to select a photo from the library instead?"),
+                    title: Text("Camera không khả dụng"),
+                    message: Text("Bạn đang sử dụng trình giả lập, vui lòng chọn ảnh thay cho Camera"),
                     primaryButton: .default(Text("Yes")) {
                         isPresentingImagePicker = true
                     },
@@ -140,6 +125,6 @@ struct SlideMenu: View {
 
 struct SlideMenu_Previews: PreviewProvider {
     static var previews: some View {
-        SlideMenu(w: 5, b: 3, userCode: .constant("studious"))
+        SlideMenu(w: 5, b: 3)
     }
 }
