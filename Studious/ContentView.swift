@@ -205,6 +205,7 @@ struct ContentView: View {
     }
     
     func nextSession() {
+        self.playNextSessionSound()
         if isBreakTime {
             timeRemaining = self.workTime
             isBreakTime = false
@@ -240,6 +241,11 @@ struct ContentView: View {
     
     func playStopSound() {
         let systemSoundID: SystemSoundID = 1114
+        AudioServicesPlaySystemSound(systemSoundID)
+    }
+    
+    func playNextSessionSound() {
+        let systemSoundID: SystemSoundID = 1022
         AudioServicesPlaySystemSound(systemSoundID)
     }
 }

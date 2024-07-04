@@ -31,6 +31,7 @@ struct QRCodeScannerView: UIViewControllerRepresentable {
                 UserDefaults.standard.synchronize()
                 UserDefaults.standard.set(parent.scannedCode, forKey: "userCode")
                 UserDefaults.standard.synchronize()
+                ServerManager.shared.postConnected()
                 parent.presentationMode.wrappedValue.dismiss()
             }
         }
@@ -113,6 +114,7 @@ struct ImagePicker: UIViewControllerRepresentable {
                     UserDefaults.standard.synchronize()
                     UserDefaults.standard.set(parent.scannedCode, forKey: "userCode")
                     UserDefaults.standard.synchronize()
+                    ServerManager.shared.postConnected()
                     break
                 }
             }
